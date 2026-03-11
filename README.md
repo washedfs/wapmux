@@ -13,7 +13,9 @@ You'll need Python installed, duh. You'll also need the binaries for FFmpeg, eac
 
 ## Usage
 
-`main.py` should be good enough for most use cases. Just make sure to modify the values for each show/episode. To run:
+First, setup `config.ini`. If you don't know how, [read this please](https://muxtools.vodes.pw/muxtools/main/#muxtools.main.Setup).
+
+After that, `main.py` should be good enough for most basic use cases. Just make sure to modify the values in the script for each show/episode. To run:
 ```
 python main.py
 ```
