@@ -1,11 +1,13 @@
 import os
+import re
+import subprocess
 
 from pathlib import Path
 
 from pyparsebluray import mpls
 
-__all__ = ['m2ts_from_playlist', 'm2ts_from_playlists']
-
+__all__ = ['m2ts_from_playlist', 'm2ts_from_playlists', 'locate_playlist']
+    
 def m2ts_from_playlist(
         playlist_file: os.PathLike,
         exclude_first: bool = False,
@@ -47,3 +49,66 @@ def m2ts_from_playlists(
         from_playlist = m2ts_from_playlist(playlist_file, exclude_first, exclude_last)
         m2ts_paths.extend(from_playlist)
     return m2ts_paths
+
+# ===Legacy code===
+# TODO: clean up/replace unreliable legacy functions
+
+def locate_playlist(
+        bdmv_dir: str,
+        count: int,
+        exclude_first: bool = False,
+        exclude_last: bool = False
+) -> Path:
+    
+    command = [
+        'eac3to', bdmv_dir
+    ]
+
+    result = subprocess.run(command, capture_output=True, text=True)
+    lines = result.stdout.split('\n')
+    potential = []
+    for m in re.findall(r"\d+\.mpls", result.stdout):
+        for line in lines:
+            if m in line:
+                potential.append(line)
+
+    playlist_file = ""
+
+    for playlist_data in potential:
+        episode_list = re.findall(r"\d+\.m2ts", playlist_data)
+        if len(episode_list) == 0:
+            break
+        true_length = len(episode_list)
+
+        if exclude_first:
+            episode_list.pop(0)
+            true_length -= 1
+        if exclude_last:
+            episode_list.pop()
+            true_length -= 1
+
+        if len(episode_list) == count:
+            playlist_file = os.path.join(bdmv_dir, 'PLAYLIST', re.search(r"\d+\.mpls", playlist_data).group())
+            break
+
+    if not playlist_file:
+        for p in re.findall(r"\[([0-9\+]+)\]\.m2ts", result.stdout):
+            episode_list = [f"000{int(ep):02d}.m2ts" for ep in p.split("+")]
+            true_length = len(episode_list)
+
+            if exclude_first:
+                episode_list.pop(0)
+                true_length -= 1
+            if exclude_last:
+                episode_list.pop()
+                true_length -= 1
+
+            if true_length == count:
+                for i, line in enumerate(lines):
+                    if p in line:
+                        break
+
+                playlist_file = os.path.join(bdmv_dir, 'PLAYLIST', re.search(r"\d+\.mpls", lines[i-1]).group())
+                break
+    
+    return Path(playlist_file)
