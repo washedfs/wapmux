@@ -1,0 +1,40 @@
+"""
+Basic mux script. Customize as necessary.
+"""
+import os
+from pathlib import Path
+
+from muxtools import Setup, Chapters, GlobSearch, SubFile, VideoFile, parse_chapters_bdmv, mux
+from wapfunc import handle_audio, create_signs_track, restyle_dialogue
+
+episode = "1"
+src = r"somefile.m2ts"
+
+setup = Setup(f"{episode:02d}")
+src_dir = Path(setup.config_file).parent
+ep_dir = Path(os.path.join(src_dir, f"{episode:02d}"))
+
+video_track = VideoFile(src).to_track(lang="und", args=["--no-global-tags", "--no-date"])
+
+jp_audio = handle_audio(src, 0)
+en_audio = handle_audio(GlobSearch(f"*E{episode:02d}*.mkv", dir=ep_dir), 1, delay=1000)
+
+full_subs_path = GlobSearch(f"*E{episode:02d}*.ass", dir=ep_dir)
+full_subs = SubFile(full_subs_path).clean_garbage().clean_styles().shift(24).shift_0()
+full_subs = restyle_dialogue(full_subs).to_track("Full Subtitles")
+signs_and_songs = create_signs_track(full_subs).to_track("Signs and Songs", default=False, forced=True)
+
+bd_chapters = parse_chapters_bdmv(src)
+chapters = Chapters(bd_chapters).set_names(["Intro", "OP", "Part A", "Part B", "ED", "Preview"])
+
+fonts = full_subs.collect_fonts(additional_fonts=[os.path.join(ep_dir, "attachments")])
+
+mux(
+    video_track,
+    *jp_audio,
+    *en_audio,
+    full_subs,
+    signs_and_songs,
+    chapters,
+    *fonts
+)
