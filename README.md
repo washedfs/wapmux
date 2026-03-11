@@ -9,11 +9,11 @@ cd wapmux
 pip install -r requirements.txt
 ```
 
-You'll need Python installed, duh. You'll also need the binaries for FFmpeg, eac3to, mkvmerge and libFLAC, as well as Aegisub installed on your device. The [muxtools documentation](https://muxtools.vodes.pw/guide/external-dependencies/) should have the links to all of these. Any Python dependencies should be installed with `requirements.txt`.
+You'll need Python installed, duh. You'll also need the binaries for FFmpeg, eac3to, mkvmerge and libFLAC, as well as Aegisub installed on your system. The [muxtools documentation](https://muxtools.vodes.pw/guide/external-dependencies/) should have the links to all of these. Any Python dependencies should be installed with `requirements.txt`.
 
 ## Usage
 
-First, setup `config.ini`. If you don't know how, [read this please](https://muxtools.vodes.pw/muxtools/main/#muxtools.main.Setup).
+First, set up `config.ini`. If you don't know how, [read this please](https://muxtools.vodes.pw/muxtools/main/#muxtools.main.Setup).
 
 After that, `main.py` should be good enough for most basic use cases. Just make sure to modify the values in the script for each show/episode. To run:
 ```
