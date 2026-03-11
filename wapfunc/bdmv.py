@@ -41,7 +41,7 @@ def m2ts_from_playlists(
         playlist_files: list[os.PathLike],
         exclude_first: bool = False,
         exclude_last: bool = False
-):
+) -> list[Path]:
     m2ts_paths = []
     for playlist_file in playlist_files:
         from_playlist = m2ts_from_playlist(playlist_file, exclude_first, exclude_last)

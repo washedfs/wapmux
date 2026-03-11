@@ -1,7 +1,7 @@
 from os import PathLike
 from pathlib import Path
 
-from muxtools import AudioFile, AudioTrack, Eac3to, FFMpeg, FLAC, standardize_tag
+from muxtools import AudioFile, AudioTrack, Eac3to, FFMpeg, FLAC
 
 __all__ = ['handle_audio']
 
