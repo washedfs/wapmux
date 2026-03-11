@@ -14,7 +14,7 @@ setup = Setup(f"{episode:02d}")
 src_dir = Path(setup.config_file).parent
 ep_dir = Path(os.path.join(src_dir, f"{episode:02d}"))
 
-video_track = VideoFile(src).to_track(lang="und", args=["--no-global-tags", "--no-date"])
+video_track = VideoFile(src).to_track(lang="und", args=["--no-global-tags", "--no-date", "--no-audio", "--no-attachments"])
 
 jp_audio = handle_audio(src, 0)
 en_audio = handle_audio(GlobSearch(f"*E{episode:02d}*.mkv", dir=ep_dir, recursive=False), 1, delay=1000)
