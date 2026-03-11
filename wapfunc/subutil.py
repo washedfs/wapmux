@@ -1,8 +1,10 @@
 from os import PathLike
+from datetime import timedelta
 
 from muxtools import SubFile, edit_style, get_complimenting_styles, DEFAULT_DIALOGUE_STYLES, gandhi_default
+from ass import Dialogue, Comment
 
-__all__ = ['create_signs_track', 'restyle_dialogue', 'set_layoutres']
+__all__ = ['create_signs_track', 'restyle_dialogue', 'set_layoutres', 'add_line', 'add_syncpoint']
 
 def create_signs_track(
         sub_file: SubFile,
@@ -34,6 +36,24 @@ def set_layoutres(sub_file: SubFile) -> SubFile:
     if layoutresy is None:
         sub_file.set_header("LayoutResY", playresy)
 
+    return sub_file
+
+def add_line(
+        sub_file: SubFile,
+        line: Dialogue,
+        line_num: int = 0
+) -> SubFile:
+    sub_file.manipulate_lines(lambda lines: lines.insert(line, line_num-1) if line_num != 0 else lines.append(line))
+    return sub_file
+
+def add_syncpoint(
+        sub_file: SubFile,
+        sync_name: str,
+        frame_num: int,
+        fps: float = 24000/1001
+) -> SubFile:
+    sync_line = Comment(start=timedelta(seconds=frame_num/fps), end=timedelta(seconds=frame_num/fps), effect=sync_name, text="{SYNC}")
+    sub_file.manipulate_lines(lambda lines: lines.insert(0, sync_line))
     return sub_file
 
 def snap_to_keyframes(
