@@ -11,7 +11,7 @@ __all__ = ['m2ts_from_playlist', 'm2ts_from_playlists', 'locate_playlist']
 def m2ts_from_playlist(
         playlist_file: os.PathLike,
         exclude_first: bool = False,
-        exclude_last: bool = False
+        exclude_last: bool = True
 ) -> list[Path]:
     playlist_path = Path(playlist_file)
     if not playlist_path.exists():
@@ -42,7 +42,7 @@ def m2ts_from_playlist(
 def m2ts_from_playlists(
         playlist_files: list[os.PathLike],
         exclude_first: bool = False,
-        exclude_last: bool = False
+        exclude_last: bool = True
 ) -> list[Path]:
     m2ts_paths = []
     for playlist_file in playlist_files:
@@ -57,9 +57,8 @@ def locate_playlist(
         bdmv_dir: str,
         count: int,
         exclude_first: bool = False,
-        exclude_last: bool = False
+        exclude_last: bool = True
 ) -> Path:
-    
     command = [
         'eac3to', bdmv_dir
     ]

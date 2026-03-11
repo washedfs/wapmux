@@ -4,7 +4,7 @@ Basic mux script. Customize as necessary.
 import os
 from pathlib import Path
 
-from muxtools import Setup, Chapters, GlobSearch, SubFile, VideoFile, parse_chapters_bdmv, mux
+from vsmuxtools import Setup, Chapters, GlobSearch, SubFile, VideoFile, src_file, mux
 from wapfunc import handle_audio, create_signs_track, restyle_dialogue
 
 episode = 1
@@ -24,8 +24,7 @@ base_subs = SubFile(base_subs_path).clean_garbage().clean_styles().shift(24).shi
 full_subs = restyle_dialogue(base_subs).to_track("Full Subtitles")
 signs_and_songs = create_signs_track(base_subs).to_track("Signs and Songs", default=False, forced=True)
 
-bd_chapters = parse_chapters_bdmv(src)
-chapters = Chapters(bd_chapters).set_names(["Intro", "OP", "Part A", "Part B", "ED", "Preview"])
+chapters = Chapters(src_file(src)).set_names(["Intro", "OP", "Part A", "Part B", "ED", "Preview"])
 
 fonts = full_subs.collect_fonts(additional_fonts=[os.path.join(ep_dir, "attachments")])
 
