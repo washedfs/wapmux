@@ -21,6 +21,8 @@ def handle_audio(
         src_path = Path(src_file)
     if src_path.suffix.lower() != ".mkv" and src_path.suffix.lower() != ".m2ts":
         raise Exception("Unsupported source file format!")
+    if src_path.suffix.lower() != ".m2ts" and commentary_tracks is not None:
+        raise Exception("Only BDMV source can have commentary tracks!")
     
     track_list = []
     if isinstance(tracks, int):
@@ -45,24 +47,29 @@ def handle_audio(
             audio_file = FFMpeg.Extractor(track_num).extract_audio(src_path)
             audio_file.container_delay = d
         
+        if track_num in commentary_tracks:
+            is_commentary = True
+        else:
+            is_commentary = False
         trackinfo = audio_file.get_trackinfo()
         audio_format = trackinfo.get_audio_format()
         if not audio_format:
             raise Exception(f"Unable to retrieve audio format for track {track_num}!")
-        if audio_format.should_not_transcode():
-            audio_track = create_audio_track(audio_file, name_scheme)
+        if audio_format.display_name.lower() == "pcm" or (transcode_all and not audio_format.should_not_transcode()):
+            audio_track = create_audio_track(FLAC(preprocess=None).encode_audio(audio_file), name_scheme, is_commentary, track_num)
             audio_tracks.append(audio_track)
         else:
-            if audio_format.display_name.lower() == "pcm" or transcode_all:
-                audio_track = create_audio_track(FLAC(preprocess=None).encode_audio(audio_file), name_scheme)
-                audio_tracks.append(audio_track)
+            audio_track = create_audio_track(audio_file, name_scheme, is_commentary, track_num)
+            audio_tracks.append(audio_track)
     return audio_tracks
 
 def create_audio_track(
         audio_file: AudioFile,
-        track_name: str = "$language$ $ch$"
+        track_name: str = "$language$ $ch$",
+        commentary: bool = False,
+        track_num: int = -1
 ) -> AudioTrack:
     trackinfo = audio_file.get_trackinfo()
     lang_tag = trackinfo.sanitized_lang.to_tag()
-    audio_track = audio_file.to_track(track_name, lang_tag, default=True, forced=False)
+    audio_track = audio_file.to_track(track_name, lang_tag, default=True, forced=False, args=[f"--commentary-flag {track_num}"] if commentary else None)
     return audio_track
