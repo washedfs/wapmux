@@ -16,7 +16,7 @@ def handle_audio(
     if isinstance(src_file, GlobSearch):
         if len(src_file.paths) < 1:
             raise Exception("GlobSearch returned no results!")
-        src_file = src_file.paths[0]
+        src_path = src_file.paths[0]
     else:
         src_path = Path(src_file)
     if src_path.suffix.lower() != ".mkv" and src_path.suffix.lower() != ".m2ts":

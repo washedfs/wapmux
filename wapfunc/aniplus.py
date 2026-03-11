@@ -35,9 +35,10 @@ def handle_signs(
 
     return dialogue, signs
 
+# currently very unreliable
 def fix_dashes(
         sub_file: SubFile,
-        honorifics: list[str] = ["san", "kun", "chan"]
+        honorifics: list[str] = ["san", "kun", "chan", "sensei"]
 ) -> SubFile:
     def _fix_dashes(lines):
         for line in lines:
