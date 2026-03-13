@@ -42,7 +42,7 @@ def handle_audio(
             d = delay[i]
         
         if d > 0:
-            audio_file = Eac3to(track_num, append=f"+{d}ms").extract_audio(src_path)
+            audio_file = Eac3to(track_num, append=f"+{d}ms -log=NUL").extract_audio(src_path)
         else:
             audio_file = FFMpeg.Extractor(track_num).extract_audio(src_path)
             audio_file.container_delay = d
