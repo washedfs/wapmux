@@ -1,5 +1,5 @@
 """
-Experimental functions for handling Aniplus subtitles.
+Experimental functions for handling Aniplus subtitles. Highly recommend manually adjusting subs afterward.
 """
 import re
 
@@ -17,6 +17,8 @@ def handle_signs(
             tag_regex = re.compile(r"{.*?}")
             line_text = tag_regex.sub("", line.text)
             new_line = _remove_quoted(line_text)
+            if new_line == "":
+                continue
             for tag in tag_regex.findall(line.text):
                 new_line = tag + new_line
             new_lines.append(Dialogue(start=line.start, end=line.end, style=line.style, text=new_line))
@@ -26,7 +28,10 @@ def handle_signs(
         new_lines = []
         for line in lines:
             line_text = re.sub(r"{.*?}", "", line.text)
-            new_line = "{\\an8}" + _keep_quoted(line_text).replace('"', "")
+            new_line = _keep_quoted(line_text).replace('"', "")
+            if new_line == "":
+                continue
+            new_line = "{\\an8}" + new_line
             new_lines.append(Dialogue(start=line.start, end=line.end, style=line.style, text=new_line))
         return new_lines
     
@@ -35,7 +40,6 @@ def handle_signs(
 
     return dialogue, signs
 
-# currently very unreliable
 def fix_dashes(
         sub_file: SubFile,
         honorifics: list[str] = ["san", "kun", "chan", "sensei"]
